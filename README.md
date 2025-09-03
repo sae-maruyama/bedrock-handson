@@ -5,7 +5,7 @@
 ## 構成
 
 - API Gateway (REST) + Lambda + DynamoDB
-- teftateファイルは、S3リモートバックエンドへ設定
+- tfstateファイルは、S3リモートバックエンドへ設定
 
 ## セットアップ
 

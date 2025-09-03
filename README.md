@@ -1,4 +1,4 @@
-# Inquiry Service
+# 概要
 
 お問い合わせフォーム用のサーバーレス API
 

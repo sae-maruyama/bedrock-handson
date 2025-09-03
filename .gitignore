@@ -1,0 +1,11 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Terraform variable files with sensitive data
+terraform.tfvars
+
+# Lambda deployment package
+*.zip

@@ -3,9 +3,9 @@ terraform {
   
   # S3バックエンドでtfstateを管理
   backend "s3" {
-    bucket       = "handson-remote-backend-250903"
+    bucket       = "handson-remote-backend-2509"
     key          = "dev/terraform.tfstate"
-    region       = "ap-northeast-1"
+    region       = "us-east-1"
     use_lockfile = true
   }
   

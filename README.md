@@ -1,6 +1,5 @@
-## 1. 全体処理フロー
-['terrafomr-project-5'](https://github.com/sae-maruyama/terraform-project-5.git) にて作成したAPI Gateway (REST) + Lambda + DynamoDBの構成に加えて使える
-Lambda関数'CreateAnswer'と'JudgeCategory'を作成する
+## 全体処理フロー
+['terrafomr-project-5'](https://github.com/sae-maruyama/terraform-project-5.git) にて作成したAPI Gateway (REST) + Lambda + DynamoDBの構成に加えて使えるLambda関数`CreateAnswer`と`JudgeCategory`を作成する
 
 ### CreateAnswer関数（問い合わせ回答生成）
 

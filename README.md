@@ -50,37 +50,3 @@
 7. **レスポンス返却**
 
    * 生成した回答と問い合わせIDを JSON で返す
-
----
-
-## 2. データ受け渡しフロー
-
-```text
-event['id']  ← Lambda に渡される問い合わせID
-    │
-    ▼
-DynamoDB から取得
-review_text = inquiry_item['reviewText']
-    │
-    ▼
-RAG検索（ナレッジベース）
-retrievalResults → context_text にまとめる
-    │
-    ▼
-prompt = f"{context_text}\n{review_text}"  ← 文字列化
-    │
-    ▼
-Bedrock Runtime に渡す
-request_body = {"messages":[{"role":"user","content":prompt}]} 
-    │
-    ▼
-Bedrock が回答生成
-response_body['content'][0]['text'] → generated_answer
-    │
-    ▼
-DynamoDB に保存
-update_itemで answer = generated_answer, updatedAt = timestamp
-    │
-    ▼
-Lambda が 200 JSON レスポンスとして返す
-```

@@ -27,11 +27,8 @@
 4. **プロンプト作成**
 
    * `reviewText` と `context_text` を組み合わせて `prompt` を作成
-   * 例:
 
      ```text
-     以下の情報を基に回答してください。
-
      ホテル情報：
      {context_text}
 

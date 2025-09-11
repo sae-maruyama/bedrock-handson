@@ -1,32 +1,23 @@
-# Lambda + DynamoDB + Bedrock + RAG 処理フロー
-
-このドキュメントは、Lambda 関数で DynamoDB と Bedrock を使った問い合わせ回答生成の処理フローとデータ受け渡しについてまとめたものです。
-
----
-
 ## 1. 全体処理フロー
-### CreateAnswer関数
+
+### CreateAnswer関数（問い合わせ回答生成）
 
 1. **Lambda が呼ばれる**
-
-   * `event` に `id` が含まれていることをチェック
-   * `id` がなければ 400 エラーを返す
+   - `event` に `id` が含まれていることをチェック
+   - `id` がなければ 400 エラーを返す
 
 2. **DynamoDB から問い合わせ内容を取得**
-
-   * `table.get_item(Key={'id': inquiry_id})`
-   * 取得したデータの `reviewText` を取り出す
+   - `table.get_item(Key={'id': inquiry_id})`
+   - 取得したデータの `reviewText` を取り出す
 
 3. **RAG（ナレッジベース検索）**
-
-   * `knowledge_base_id` が設定されている場合、Bedrock Agent Runtime を使用して検索
-   * 検索クエリは `reviewText`
-   * ベクトル検索の場合、ナレッジベース内で類似度の高い結果を取得
-   * 取得結果から本文をまとめて `context_text` に格納
+   - `knowledge_base_id` が設定されている場合、Bedrock Agent Runtime を使用して検索
+   - 検索クエリは `reviewText`
+   - ベクトル検索により類似度の高い結果を取得
+   - 取得結果から本文をまとめて `context_text` に格納
 
 4. **プロンプト作成**
-
-   * `reviewText` と `context_text` を組み合わせて `prompt` を作成
+   - `reviewText` と `context_text` を組み合わせて `prompt` を作成
 
      ```text
      ホテル情報：
@@ -37,16 +28,53 @@
      ```
 
 5. **Bedrock Runtime で回答生成**
-
-   * `request_body` に `prompt` をセット
-   * `bedrock_runtime.invoke_model(modelId=model_id, body=json.dumps(request_body))` でモデル呼び出し
-   * 返却された JSON から `generated_answer = response_body['content'][0]['text']` を取得
+   - `request_body` に `prompt` をセット
+   - `bedrock_runtime.invoke_model(modelId=model_id, body=json.dumps(request_body))` でモデル呼び出し
+   - 返却された JSON から `generated_answer = response_body['content'][0]['text']` を取得
 
 6. **DynamoDB に回答を保存**
-
-   * `update_item` を使用し、`answer` と `updatedAt` を更新
-   * 既存フィールドは保持される
+   - `update_item` を使用し、`answer` と `updatedAt` を更新
+   - 既存フィールドは保持される
 
 7. **レスポンス返却**
+   - 生成した回答と問い合わせIDを JSON で返す
 
-   * 生成した回答と問い合わせIDを JSON で返す
+---
+
+### JudgeCategory関数（問い合わせ分類）
+
+1. **Lambda が呼ばれる**
+   - `event` に `id` が含まれていることをチェック
+   - `id` がなければ 400 エラーを返す
+
+2. **DynamoDB から問い合わせ内容を取得**
+   - `table.get_item(Key={'id': inquiry_id})`
+   - 取得したデータの `reviewText` を取り出す
+   - 存在しなければ 404 エラー、空であれば 400 エラーを返す
+
+3. **分類用プロンプト作成**
+   - 以下のカテゴリから必ず1つを選択するように指示
+     - 質問
+     - 改善要望
+     - ポジティブな感想
+     - ネガティブな感想
+     - その他
+   - 回答はカテゴリ名のみ
+
+4. **Bedrock Runtime で分類**
+   - `request_body` にプロンプトをセット
+   - `bedrock_runtime.invoke_model(modelId=model_id, body=json.dumps(request_body))` でモデル呼び出し
+   - 出力結果を `raw_category = response_body['content'][0]['text'].strip()` として取得
+
+5. **分類結果を正規化**
+   - 有効なカテゴリ一覧 `['質問', '改善要望', 'ポジティブな感想', 'ネガティブな感想', 'その他']`
+   - `raw_category` がいずれかに部分一致すれば採用、なければ `"その他"`
+
+6. **DynamoDB に分類結果を保存**
+   - `update_item` を使用し、`Category` と `updatedAt` を更新
+   - 既存フィールドは保持される
+
+7. **レスポンス返却**
+   - 分類結果と問い合わせIDを JSON で返す
+
+---

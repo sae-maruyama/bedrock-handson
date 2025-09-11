@@ -87,36 +87,3 @@ update_itemで answer = generated_answer, updatedAt = timestamp
     ▼
 Lambda が 200 JSON レスポンスとして返す
 ```
-
----
-
-## 3. 主要ポイント
-
-* **プロンプト中心**: Bedrock には文字列プロンプトのみ渡す
-* **RAG検索**: `review_text` をクエリとしてナレッジベースから関連情報を取得
-* **DynamoDB 更新**: `SET` を使い、回答と更新時刻だけを上書き（部分更新）
-* **生成AIは文字列のみ扱う**: オブジェクトや辞書はプロンプト内で文字列化する必要がある
-
----
-
-## 4. CRUD に対応する処理
-
-| CRUD   | Lambda コード例     | 説明                           |
-| ------ | --------------- | ---------------------------- |
-| Create | `put_item()`    | 新規問い合わせ追加（今回は対象外）            |
-| Read   | `get_item()`    | DynamoDB から `reviewText` を取得 |
-| Update | `update_item()` | `answer` と `updatedAt` を更新   |
-| Delete | `delete_item()` | 問い合わせ削除（今回は未使用）              |
-
----
-
-## 5. 用語まとめ
-
-* **SET**: `update_item` でフィールドを設定・上書きする操作
-* **prompt**: 取得データや検索結果をまとめた文字列。Bedrock に渡す入力
-* **context\_text**: RAG検索で取得したナレッジベースの本文をまとめた文字列
-* **generated\_answer**: モデルが生成した回答テキスト
-
----
-
-以上が Lambda + DynamoDB + Bedrock + RAG 処理の全体フローとデータ受け渡しまとめです。

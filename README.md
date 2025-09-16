@@ -4,10 +4,10 @@
 
 ## 前提
 1. **RAGデータ**
-一例としてホテルの営業時間、住所、チェックイン・チェックアウト時間等の情報をまとめたデータソース（hotelinfo.md）をS3バケットにアップロードし、RAGデータとして利用可能にする
+- 一例としてホテルの営業時間、住所、チェックイン・チェックアウト時間等の情報をまとめたデータソース（hotelinfo.md）をS3バケットにアップロードし、RAGデータとして利用可能にする
 2. **BedRock**
-基盤モデル：anthropic.claude-3-sonnet-20240229-v1:0
-ナレッジベース：埋め込みモデル（cohere.embed-multilingual-v3）・ベクトルデータベース（open search serverledd）・データソース（hotelinfo.md）
+- 基盤モデル：anthropic.claude-3-sonnet-20240229-v1:0
+- ナレッジベース：埋め込みモデル（cohere.embed-multilingual-v3）・ベクトルデータベース（open search serverledd）・データソース（hotelinfo.md）
 
 ## 構成
 ### CreateAnswer関数（問い合わせ回答生成）

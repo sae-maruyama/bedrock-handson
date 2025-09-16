@@ -1,6 +1,16 @@
-## 全体処理フロー
-['terrafomr-project-5'](https://github.com/sae-maruyama/terraform-project-5.git) にて作成したAPI Gateway (REST) + Lambda + DynamoDBの構成に加えて使えるLambda関数`CreateAnswer`と`JudgeCategory`を作成する
+## 概要
+[terrafomr-project-5](https://github.com/sae-maruyama/terraform-project-5.git) にて作成した問い合わせ受付機能（API Gateway + Lambda + DynamoDB）に対して、Amazon Bedrock を活用し、生成AIを用いて自動で回答を生成する仕組みを追加する
+プライベートな情報にも対応できるよう、S3バケットにRAGデータを保存し、それを基に回答を生成する
+Lambda関数`CreateAnswer`と`JudgeCategory`を作成する
 
+## 前提
+1. **RAGデータ**
+一例としてホテルの営業時間、住所、チェックイン・チェックアウト時間等の情報をまとめたファイル（hotelinfo.md）をS3バケットにアップロードし、RAGデータとして利用可能にする
+2. **BedRock**
+基盤モデル：anthropic.claude-3-sonnet-20240229-v1:0
+ナレッジベース：埋め込みモデル（cohere.embed-multilingual-v3）・ベクトルデータベース（open search serverledd）・データソース（hotelinfo.md）
+
+## 構成
 ### CreateAnswer関数（問い合わせ回答生成）
 
 1. **Lambda が呼ばれる**
